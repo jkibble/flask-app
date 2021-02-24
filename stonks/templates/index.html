@@ -1,12 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
-</head>
-<body>
-	<h1>Here is the home page</h1>
-</body>
-</html>
+{% extends "layout.html" %}
+
+{% block title %}Index Title{% endblock %}
+
+{% block body %}
+<h1>Task Master</h1>
+
+<div>
+  <table class="table-auto border-separate border border-green-800">
+    <tr>
+      <th>Task</th>
+      <th>Added</th>
+      <th>Actions</th>
+    </tr>
+    {% for task in tasks %}
+      <tr>
+        <td id=task_{{ task.id }}>{{ task.content }}</td>
+        <td>{{ task.date_created.date() }}</td>
+        <td>
+          <a href="/delete/{{ task.id }}">Delete</a>
+          <a href="javascript:updateTask({{ task.id }})">Update</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+<div>
+<form action="/" method="post">
+  <input type="text" name="content" autofocus="true">
+  <input type="submit" value="Add Task">
+</form>
+</div>
+</section>
+{% endblock %}
+
+{% block script %}
+<script>
+  let updateTask = function(id) {
+    let cell = document.querySelector('#task_' + id)
+    let content = cell.innerHTML;
+
+    cell.innerHTML =`
+      <form action="/update/${id}" method="POST">
+        <input type="text" autofocus="true" name="content" value="${content}">
+        <input type="submit" value="Save">
+      </form>
+    `
+  }
+</script>
+{% endblock %}
