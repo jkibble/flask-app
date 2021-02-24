@@ -1,16 +1,15 @@
-# client id 9q2mCdROQG9Llw
-# secret ApGKCNTKuJ8sFVoe2moxRFdm8u1cHg
-
 import re
+import os
 import praw
 import pprint
-import secrets
+from dotenv import load_dotenv
+load_dotenv()
 
 pp = pprint.PrettyPrinter(indent=4)
 
 reddit = praw.Reddit(
-    client_id = secrets.client_id,
-    client_secret = secrets.client_secret,
+    client_id = os.getenv('REDDIT_ID'),
+    client_secret = os.getenv('REDDIT_SECRET'),
     user_agent = 'praw test bot'
 )
 
