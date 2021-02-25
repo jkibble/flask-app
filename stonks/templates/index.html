@@ -1,50 +1,88 @@
 {% extends "layout.html" %}
 
-{% block title %}Index Title{% endblock %}
+{% block title %}Graphs!!!{% endblock %}
 
 {% block body %}
-<h1>Task Master</h1>
+<div class="grid grid-cols-1 gap-10">
+  <div>
+    <input type="text" v-model="ticker" v-on:keyup.enter="searchTicker">
+  </div>
+  <div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>Company Name</th>
+          <th>Currency</th>
+          <th>Exchange</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="ticker in tickers">
+          <td>
+            <a href="#" @click.prevent="selectStock(ticker)" v-text="ticker.symbol"></a>
+          </td>
+          <td><span v-text="ticker.name"></span></td>
+          <td><span v-text="ticker.currency"></span></td>
+          <td><span v-text="ticker.stockExchange"></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <hr>
+  <div>
+    <img class="image is-32x32" :src="companyInfo.logo_url">
+    <span class="title" v-text="companyName"></span>
+  </div>
+  <div id="graph1">
+    <svg>
+      <g class="grid x-grid">
+        <line x1="90" x2="90" y1="5" y2="371"></line>
+      </g>
+      <g class="grid y-grid">
+        <line x1="90" x2="705" y1="370" y2="370"></line>
+      </g>
+      <g v-if="stocks.Datetime.length">
+        <path class="path animate" :d="closePath" stroke="red" />
+        <path class="path animate delay" style="animation-delay: 0.25s;" :d="openPath" stroke="blue" />
+      </g>
+    </svg>
+  </div>
+</div>
 
-<div>
-  <table class="table-auto border-separate border border-green-800">
-    <tr>
-      <th>Task</th>
-      <th>Added</th>
-      <th>Actions</th>
-    </tr>
-    {% for task in tasks %}
-      <tr>
-        <td id=task_{{ task.id }}>{{ task.content }}</td>
-        <td>{{ task.date_created.date() }}</td>
-        <td>
-          <a href="/delete/{{ task.id }}">Delete</a>
-          <a href="javascript:updateTask({{ task.id }})">Update</a>
-        </td>
-      </tr>
-    {% endfor %}
-  </table>
-</div>
-<div>
-<form action="/" method="post">
-  <input type="text" name="content" autofocus="true">
-  <input type="submit" value="Add Task">
-</form>
-</div>
-</section>
 {% endblock %}
 
-{% block script %}
-<script>
-  let updateTask = function(id) {
-    let cell = document.querySelector('#task_' + id)
-    let content = cell.innerHTML;
-
-    cell.innerHTML =`
-      <form action="/update/${id}" method="POST">
-        <input type="text" autofocus="true" name="content" value="${content}">
-        <input type="submit" value="Save">
-      </form>
-    `
+{% block style %}
+<style>
+  .path.animate {
+    animation: dash 1.25s;
+    stroke-linecap: round;
+    stroke-dasharray: 2792.485595703125;
+    stroke-dashoffset: 2792.485595703125;
+    animation-fill-mode: forwards;
+    fill: none;
+    stroke-width: 3;
   }
-</script>
+
+  @keyframes dash {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  #graph1 {
+    border: 2px solid goldenrod;
+    margin: 0px;
+    padding: 0px;
+  }
+
+  svg {
+    padding: 0px;
+    margin: 0px;
+    height: 600px;
+    width: 100%;
+    border: 1px solid red"
+
+  }
+</style>
 {% endblock %}

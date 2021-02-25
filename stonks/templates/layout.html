@@ -6,15 +6,16 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}{% endblock %}</title>
-  <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
 </head>
 
-<body class="min-h-screen bg-gray-100">
-  <div class="container mx-auto">
+<body>
+  <div id="app" class="container">
     {% block body %}{% endblock %}
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-    {% block script %}{% endblock %}
   </div>
+  {% block style %} {% endblock %}
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.5.0/d3.js" integrity="sha512-2nLXOoZV+KjQ2441hhAziFojHuDNA26V75wBlz4ll24UNZAjqG0u26ap7NmVVRXqNL+g9jCtueOplEune26/tA==" crossorigin="anonymous"></script>  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  {% block script %}{% endblock %}
 </body>
-
 </html>
