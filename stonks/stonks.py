@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
+import numpy as np
 
 import pandas as pd
+import pandas_datareader.data as web
 import requests
 import yfinance as yf
 
@@ -14,13 +16,16 @@ class stonks:
     return company.info
 
   def getStonks(ticker):
-    company = yf.Ticker(ticker)
-    stocks = company.history(period='5d', interval='60m')
-    stocks['Open_EMA'] = stocks['Open'].ewm(span = 50, adjust = False).mean()
-    stocks['Close_EMA'] = stocks['Close'].ewm(span = 50, adjust = False).mean()
-    stocks['High_EMA'] = stocks['High'].ewm(span = 50, adjust = False).mean()
-    stocks['Low_EMA'] = stocks['Low'].ewm(span = 50, adjust = False).mean()
-    # stocks = stocks.groupby(stocks.index.strftime('%Y-%m-%d %H:00')).mean()
+
+    start = datetime.today() - timedelta(days = 365)
+    end = datetime.today()
+
+    stocks = web.DataReader(ticker, 'yahoo', start = start, end = end)
+    stocks['previous7daylow'] = stocks['Low'].rolling(window = 7).min()
+    stocks['previous7dayhigh'] = stocks['Low'].rolling(window = 7).max()
+    stocks['previous200dayclose'] = stocks['Close'].ewm(span = 200, adjust = False).mean()
+    stocks['buy'] = np.where(stocks['previous7daylow'] > stocks['previous200dayclose'], 1.0, 0.0)
+    stocks['sell'] = np.where(stocks['Close'] > stocks['previous7dayhigh'], 1.0, 0.0)
     stocks['Datetime'] = stocks.index.map(str)
 
-    return stocks.to_dict('list')
+    return stocks.tail(30).to_dict('list')

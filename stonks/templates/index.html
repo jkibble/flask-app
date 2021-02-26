@@ -34,27 +34,21 @@
     <img class="image is-32x32" :src="companyInfo.logo_url">
     <span class="title" v-text="companyName"></span>
   </div>
-  <div id="graph1">
-    <svg>
-      <g class="grid x-grid">
-        <line x1="90" x2="90" y1="5" y2="371"></line>
-      </g>
-      <g class="grid y-grid">
-        <line x1="90" x2="705" y1="370" y2="370"></line>
-      </g>
-      <g v-if="stocks.Datetime.length">
-        <path class="path animate" :d="closePath" stroke="red" />
-        <path class="path animate delay" style="animation-delay: 0.25s;" :d="openPath" stroke="blue" />
-      </g>
-    </svg>
-  </div>
+  <div id="graph1"></div>
 </div>
 
 {% endblock %}
 
 {% block style %}
 <style>
-  .path.animate {
+  #graph1 {
+    margin: 0px;
+    padding: 0px;
+    height: 600px;
+    width: 100%;
+  }
+
+  path {
     animation: dash 1.25s;
     stroke-linecap: round;
     stroke-dasharray: 2792.485595703125;
@@ -68,21 +62,6 @@
     to {
       stroke-dashoffset: 0;
     }
-  }
-
-  #graph1 {
-    border: 2px solid goldenrod;
-    margin: 0px;
-    padding: 0px;
-  }
-
-  svg {
-    padding: 0px;
-    margin: 0px;
-    height: 600px;
-    width: 100%;
-    border: 1px solid red"
-
   }
 </style>
 {% endblock %}
