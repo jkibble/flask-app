@@ -7,6 +7,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}{% endblock %}</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+  <header>
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+      integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
+  </header>
+
 </head>
 
 <body>
@@ -15,7 +20,11 @@
   </div>
   {% block style %} {% endblock %}
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.5.0/d3.js" integrity="sha512-2nLXOoZV+KjQ2441hhAziFojHuDNA26V75wBlz4ll24UNZAjqG0u26ap7NmVVRXqNL+g9jCtueOplEune26/tA==" crossorigin="anonymous"></script>  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
   {% block script %}{% endblock %}
 </body>
+
 </html>

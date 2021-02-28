@@ -5,7 +5,7 @@
 {% block body %}
 <div class="grid grid-cols-1 gap-10">
   <div>
-    <input type="text" v-model="ticker" v-on:keyup.enter="searchTicker">
+    <input type="text" class="input" v-model="ticker" v-on:keyup.enter="searchTicker">
   </div>
   <div>
     <table class="table">
@@ -13,30 +13,62 @@
         <tr>
           <th>Symbol</th>
           <th>Company Name</th>
-          <th>Currency</th>
+          <th>Type</th>
           <th>Exchange</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="ticker in tickers">
           <td>
-            <a href="#" @click.prevent="selectStock(ticker)" v-text="ticker.symbol"></a>
+            <a href="#" @click.prevent="selectStock(ticker.symbol)" v-text="ticker.symbol"></a>
           </td>
           <td><span v-text="ticker.name"></span></td>
-          <td><span v-text="ticker.currency"></span></td>
-          <td><span v-text="ticker.stockExchange"></span></td>
+          <td><span v-text="ticker.typeDisp"></span></td>
+          <td><span v-text="ticker.exchDisp"></span></td>
         </tr>
       </tbody>
     </table>
   </div>
   <hr>
   <div>
-    <img class="image is-32x32" :src="companyInfo.logo_url">
-    <span class="title" v-text="companyName"></span>
+    <span class="title" v-text="info.longName"></span>
   </div>
+  <form @submit.prevent="selectStock(options.ticker)">
+    <div class="field">
+      <div class="columns">
+        <div class="column">
+          <label class="label">Ticker</label>
+          <input type="text" class="input" v-model="options.ticker">
+        </div>
+        <div class="column">
+          <label class="label">Short Window</label>
+          <input type="text" class="input" v-model="options.short">
+        </div>
+        <div class="column">
+          <label class="label">Long Window</label>
+          <input type="text" class="input" v-model="options.long">
+        </div>
+        <div class="column">
+          <label class="label">Days</label>
+          <input type="text" class="input" v-model="options.days">
+        </div>
+        <div class="column">
+          <label class="label">Investment</label>
+          <div class="control has-icons-left">
+            <input type="text" class="input" v-model="options.money">
+            <span class="icon is-small is-left">
+              <i class="fas fa-dollar-sign"></i>
+            </span>
+          </div>
+        </div>
+        <div class="column">
+          <input class="button is-primary" type="submit" value="Update">
+        </div>
+      </div>
+    </div>
+  </form>
   <div id="graph1"></div>
 </div>
-
 {% endblock %}
 
 {% block style %}
@@ -48,20 +80,8 @@
     width: 100%;
   }
 
-  path {
-    animation: dash 1.25s;
-    stroke-linecap: round;
-    stroke-dasharray: 2792.485595703125;
-    stroke-dashoffset: 2792.485595703125;
-    animation-fill-mode: forwards;
-    fill: none;
-    stroke-width: 3;
-  }
-
-  @keyframes dash {
-    to {
-      stroke-dashoffset: 0;
-    }
+  details {
+    display: none
   }
 </style>
 {% endblock %}

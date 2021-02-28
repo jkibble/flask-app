@@ -4,92 +4,48 @@ const app = new Vue({
   data: {
     ticker: '',
     tickers: [],
-    companyName: '',
-    companyInfo: {},
+    info: {},
     stocks: {
       Datetime: [],
     },
-    width: 0,
-    height: 0,
-    svg: {},
-    x: {},
-    y: {},
-    line: {},
-    thing: ''
+    options: {
+      ticker: '',
+      name: '',
+      short: 5,
+      long: 10,
+      days: 60,
+      money: 1000
+    }
   },
 
   mounted() {
-    const el = document.querySelector('#graph1');
-    let self = this;
-
-    this.width = el.offsetWidth;
-    this.height = el.offsetHeight;
-
-    this.initalizeGraph();
-
-    this.selectStock({ symbol: 'AAPL', name: 'Apple' });
+    this.selectStock('GME');
   },
 
   methods: {
-    selectStock(ticker) {
+    selectStock(symbol) {
       let self = this;
+      self.options.ticker = symbol
+      self.tickers = [];
 
-      self.companyName = ticker.name
+      document.querySelector('#graph1').innerHTML = '<img class="center" src="https://wpamelia.com/wp-content/uploads/2018/11/ezgif-2-6d0b072c3d3f.gif">'
 
-      fetch(`/select/${ticker.symbol}`)
+      fetch(`/select/${symbol}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(this.options)
+      })
         .then(response => response.json())
         .then(data => {
-          self.companyInfo = data.company;
-          self.stocks = data.stocks;
+          self.info = data.company;
 
-          this.addLine(this.formatData('Close'), 'red');
-          this.addLine(this.formatData('Open'), 'blue');
-          this.addLine(this.formatData('previous7dayhigh'), 'goldenrod');
-          this.addLine(this.formatData('previous7daylow'), 'black');
+          vegaEmbed('#graph1', data.chart);
         })
         .catch((error) => {
           console.error('Error:', error);
         });
-    },
-
-    addLine(data, colour) {
-      this.x.domain(d3.extent(data, d => d.date))
-      this.y.domain([0, d3.max(data, d => d.value)])
-
-      this.svg.append('path')
-        .attr('fill', 'none')
-        .attr('stroke', colour)
-        .attr('stroke-width', 1.5)
-        .attr('d', this.line(data));
-    },
-
-    initalizeGraph() {
-      // this.svg.remove();
-
-      this.svg = d3.select('#graph1').append('svg');
-
-      this.svg.attr('width', this.width)
-        .attr('height', this.height)
-        .append('g');
-
-      let x = d3.scaleUtc().range([0, this.width]);
-      let y = d3.scaleLinear().range([this.height, 0]);
-
-      let line = d3.line()
-        .defined(d => !isNaN(d.value))
-        .x(d => x(d.date))
-        .y(d => y(d.value));
-
-      let xAxis = d3.axisBottom(x).tickFormat(d3.timeFormat('%b %d'));
-      let yAxis = d3.axisLeft(y);
-
-      let focus = this.svg.append('g').attr('transform', 'translate(20, 20)');
-      focus.append('g').attr('transform', `translate(0, ${this.height - 30})`).call(xAxis);
-      focus.append('g').call(yAxis);
-
-      this.x = x;
-      this.y = y;
-      this.line = line;
     },
 
     searchTicker() {
@@ -116,8 +72,8 @@ const app = new Vue({
 
       return this.stocks.Datetime.map(function (date, index) {
         return {
-          date: new Date(date),
-          value: self.stocks[column][index]
+          t: new Date(date),
+          x: self.stocks[column][index]
         }
       });
     }

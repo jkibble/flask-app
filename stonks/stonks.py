@@ -6,26 +6,41 @@ import pandas_datareader.data as web
 import requests
 import yfinance as yf
 
+
 class stonks:
-  def tickerSearch(ticker):
-    response = requests.get(f'https://financialmodelingprep.com/api/v3/search?query={ticker}&limit=5&apikey=demo')
-    return response.json()
+    def tickerSearch(search):
+        response = requests.get(
+            f'http://d.yimg.com/autoc.finance.yahoo.com/autoc?query={search}&region=1&lang=en'
+        )
+        results = response.json()
 
-  def getCompanyInfo(ticker):
-    company = yf.Ticker(ticker)
-    return company.info
+        return results['ResultSet']['Result']
 
-  def getStonks(ticker):
+    def getCompanyInfo(ticker):
+        company = yf.Ticker(ticker)
+        return company.info
 
-    start = datetime.today() - timedelta(days = 365)
-    end = datetime.today()
+    def getStonks(ticker, short = 5, long = 10, days = 60, money = 1000):
 
-    stocks = web.DataReader(ticker, 'yahoo', start = start, end = end)
-    stocks['previous7daylow'] = stocks['Low'].rolling(window = 7).min()
-    stocks['previous7dayhigh'] = stocks['Low'].rolling(window = 7).max()
-    stocks['previous200dayclose'] = stocks['Close'].ewm(span = 200, adjust = False).mean()
-    stocks['buy'] = np.where(stocks['previous7daylow'] > stocks['previous200dayclose'], 1.0, 0.0)
-    stocks['sell'] = np.where(stocks['Close'] > stocks['previous7dayhigh'], 1.0, 0.0)
-    stocks['Datetime'] = stocks.index.map(str)
+        start = datetime.today() - timedelta(days = int(days))
+        end = datetime.today()
 
-    return stocks.tail(30).to_dict('list')
+        df = web.DataReader(ticker, 'yahoo', start = start, end = end)
+
+        df['Short'] = df['Close'].rolling(window = int(short), min_periods = 1).mean()
+        df['Long'] = df['Close'].rolling(window = int(long), min_periods = 1).mean()
+
+        df['Drop'] = df['Close'].pct_change() * 100
+        df['Signal'] = np.where(df['Short'] > df['Long'], 1.0, 0.0)
+        df['Position'] = df['Signal'].diff()
+        df['Buy'] = np.where(df['Position'] == 1.0, df['Close'], float("nan"))
+        df['Sell'] = np.where(
+          (df['Position'] == -1.0) | (df['Drop'] < -20),
+          df['Close'],
+          float("nan")
+        )
+        df['Datetime'] = df.index.strftime('%Y-%m-%d')
+
+        df.drop(['High', 'Low', 'Open', 'Volume', 'Adj Close'], axis = 1, inplace = True)
+
+        return df
