@@ -4,33 +4,31 @@ const app = new Vue({
   data: {
     ticker: '',
     tickers: [],
-    info: {},
     stocks: {
       Datetime: [],
     },
     options: {
-      ticker: '',
-      name: '',
-      short: 5,
-      long: 10,
-      days: 60,
-      money: 1000
+      tickers: '',
+      short: 10,
+      long: 20,
+      timeframe: '5m',
+      movingAverage: 'SMA'
     }
   },
 
   mounted() {
-    this.selectStock('GME');
+    this.selectStock('gme yolo tsla msft lyft');
   },
 
   methods: {
     selectStock(symbol) {
       let self = this;
-      self.options.ticker = symbol
+      self.options.tickers = symbol
       self.tickers = [];
 
       document.querySelector('#graph1').innerHTML = '<img class="center" src="https://wpamelia.com/wp-content/uploads/2018/11/ezgif-2-6d0b072c3d3f.gif">'
 
-      fetch(`/select/${symbol}`, {
+      fetch(`/select-stocks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,9 +37,8 @@ const app = new Vue({
       })
         .then(response => response.json())
         .then(data => {
-          self.info = data.company;
 
-          vegaEmbed('#graph1', data.chart);
+          vegaEmbed('#graph1', data);
         })
         .catch((error) => {
           console.error('Error:', error);

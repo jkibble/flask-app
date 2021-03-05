@@ -16,7 +16,7 @@ reddit = praw.Reddit(
 lists = []
 
 print('gettng posts')
-posts = reddit.subreddit('wallstreetbets').new(limit=1000)
+posts = reddit.subreddit('GME').new(limit=1000)
 print('aggregatting posts')
 for post in posts:
     title_ticker = re.search(r'\b[\$#]?([A-Z]{2,5})\b', post.title + post.selftext)
@@ -51,7 +51,7 @@ newStonks = {}
 
 print('filtering stonks')
 for ticker, stonk in stonks.items():
-    if (stonk['count'] > 10 and stonk['score'] > 10000):
+    if (stonk['count'] > 10 and stonk['score'] > 5000):
         newStonks[ticker] = stonk
 
 pp.pprint(newStonks);

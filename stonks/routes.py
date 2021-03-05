@@ -2,68 +2,84 @@ from stonks import app
 from flask import render_template, request
 import altair as alt
 
-from .stonks import stonks
+import stonks.stock_calc as Stocks
 
+scraper = Stocks.Stonks()
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-
 @app.route('/search', methods=['POST'])
 def search():
     search = request.get_json()['search']
-    tickers = stonks.tickerSearch(search)
+    tickers = scraper.tickerSearch(search)
 
     return {'tickers': tickers}
 
 
-@app.route('/select/<ticker>', methods=['POST', 'GET'])
-def calculate(ticker):
-    info = stonks.getCompanyInfo(ticker)
+@app.route('/select-stocks', methods=['POST'])
+def calculate():
     options = request.get_json()
-    stocks = stonks.getStonks(ticker, options['short'], options['long'], options['days'], options['money'])
+    stocks = scraper.getStonks(options['tickers'], options['short'], options['long'], options['timeframe'], options['movingAverage'])
     interval = alt.selection_interval(encodings=['x'])
+    selection = alt.selection_multi(fields=['symbol'], bind='legend')
+    selection2 = alt.selection_multi(fields=['sell'], bind='legend')
 
     print(stocks)
 
-    close = alt.Chart(stocks).transform_fold(
-        ['Close', 'Short', 'Long'],
-        as_=['Status', 'Price']
-    ).mark_line().encode(
-        x='Datetime:T',
-        y='Price:Q',
-        color='Status:N'
+    close = alt.Chart(
+        stocks
+    ).mark_line(
+        point=True
+    ).encode(
+        x='time:T',
+        y='close:Q',
+        color='symbol:N',
+        tooltip='close:Q',
+        opacity=alt.condition(selection, alt.value(1), alt.value(0.2))
     ).properties(
         width=1200,
         height=600
-    ).add_selection(interval)
-
-
-    sell = alt.Chart(stocks).mark_text().encode(
-        x='Datetime:T',
-        y='Sell:Q',
-        text=alt.value('Sell!'),
-        tooltip='Close:Q'
+    ).add_selection(
+        interval,
+        selection
     )
 
-    buy = alt.Chart(stocks).mark_text().encode(
-        x='Datetime:T',
-        y='Buy:Q',
-        text=alt.value('Buy!'),
-        tooltip='Close:Q'
+    sell = alt.Chart(stocks).mark_point(
+        filled=True,
+        size=200,
+        shape='triangle-down',
+        color='red',
+        opacity=0.5
+    ).encode(
+        x='time:T',
+        y='sell:Q',
+        tooltip='close:Q'
     )
 
-    fill = alt.Chart(stocks).mark_area(color='#ADCCFF', opacity=0.3).encode(
-        x='Datetime:T',
-        y='Short:Q',
-        y2='Long:Q'
+    buy = alt.Chart(stocks).mark_point(
+        filled=True,
+        size=200,
+        shape='triangle-up',
+        color='green',
+        opacity=0.5
+    ).encode(
+        x='time:T',
+        y='buy:Q',
+        tooltip='close:Q'
     )
 
-    # rule = alt.Chart(stocks).mark_rule(color='red').encode(
-    #     y='Sell:Q'
-    # )
+    area = alt.Chart(stocks).mark_area(
+        opacity=0.3
+    ).encode(
+        x='time:T',
+        y='short:Q',
+        y2='long:Q',
+        color='symbol:N',
+        opacity=alt.condition(selection, alt.value(0.5), alt.value(0.1))
+    )
 
-    chart = close + sell + buy + fill
+    chart = close + buy + sell + area
 
-    return {'company': info, 'chart': chart.to_dict()}
+    return chart.to_dict()

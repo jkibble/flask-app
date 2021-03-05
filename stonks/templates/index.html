@@ -30,15 +30,12 @@
     </table>
   </div>
   <hr>
-  <div>
-    <span class="title" v-text="info.longName"></span>
-  </div>
-  <form @submit.prevent="selectStock(options.ticker)">
+  <form @submit.prevent="selectStock(options.tickers)">
     <div class="field">
       <div class="columns">
         <div class="column">
           <label class="label">Ticker</label>
-          <input type="text" class="input" v-model="options.ticker">
+          <input type="text" class="input" v-model="options.tickers">
         </div>
         <div class="column">
           <label class="label">Short Window</label>
@@ -49,17 +46,22 @@
           <input type="text" class="input" v-model="options.long">
         </div>
         <div class="column">
-          <label class="label">Days</label>
-          <input type="text" class="input" v-model="options.days">
+          <label class="label">Time Scale</label>
+          <select class="select" v-model="options.timeframe">
+            <option value="1m">1 Minute</option>
+            <option value="2m">2 Minutes</option>
+            <option value="5m">5 Minutes</option>
+            <option value="15m">15 Minutes</option>
+            <option value="30m">30 Minutes</option>
+            <option value="60m">60 Minutes</option>
+            <option value="90m">90 Minutes</option>
+            <option value="1d">1 Day</option>
+          </select>
         </div>
         <div class="column">
-          <label class="label">Investment</label>
-          <div class="control has-icons-left">
-            <input type="text" class="input" v-model="options.money">
-            <span class="icon is-small is-left">
-              <i class="fas fa-dollar-sign"></i>
-            </span>
-          </div>
+          <label>SMA <input type="radio" v-model="options.movingAverage" value="SMA"></label>
+          <br>
+          <label>EWM <input type="radio" v-model="options.movingAverage" value="EWM"></label>
         </div>
         <div class="column">
           <input class="button is-primary" type="submit" value="Update">
