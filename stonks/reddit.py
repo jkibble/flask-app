@@ -16,7 +16,7 @@ reddit = praw.Reddit(
 lists = []
 
 print('gettng posts')
-posts = reddit.subreddit('GME').new(limit=1000)
+posts = reddit.subreddit('wallstreetbets').new(limit=2000)
 print('aggregatting posts')
 for post in posts:
     title_ticker = re.search(r'\b[\$#]?([A-Z]{2,5})\b', post.title + post.selftext)

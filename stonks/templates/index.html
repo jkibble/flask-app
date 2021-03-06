@@ -59,9 +59,11 @@
           </select>
         </div>
         <div class="column">
-          <label>SMA <input type="radio" v-model="options.movingAverage" value="SMA"></label>
+          <label>Rolling Average <input type="radio" v-model="options.movingAverage" value="SMA"></label>
           <br>
-          <label>EWM <input type="radio" v-model="options.movingAverage" value="EWM"></label>
+          <label>Weighted Average <input type="radio" v-model="options.movingAverage" value="EWM"></label>
+          <br>
+          <label>Relative Strength<input type="radio" v-model="options.movingAverage" value="RSI"></label>
         </div>
         <div class="column">
           <input class="button is-primary" type="submit" value="Update">

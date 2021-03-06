@@ -24,7 +24,6 @@ def calculate():
     stocks = scraper.getStonks(options['tickers'], options['short'], options['long'], options['timeframe'], options['movingAverage'])
     interval = alt.selection_interval(encodings=['x'])
     selection = alt.selection_multi(fields=['symbol'], bind='legend')
-    selection2 = alt.selection_multi(fields=['sell'], bind='legend')
 
     print(stocks)
 
@@ -36,11 +35,11 @@ def calculate():
         x='time:T',
         y='close:Q',
         color='symbol:N',
-        tooltip='close:Q',
+        tooltip='change:Q',
         opacity=alt.condition(selection, alt.value(1), alt.value(0.2))
     ).properties(
         width=1200,
-        height=600
+        height=550
     ).add_selection(
         interval,
         selection

@@ -3,21 +3,25 @@ from datetime import datetime, timedelta
 import pandas as pd
 from pandas_datareader import data as pdr
 
-def getYahooStocks(symbols, timeframe='5Min', limit=30):
-    aggregate = []
-    start = datetime.today() - timedelta(days = limit)
-    end = datetime.today()
+class YahooClient:
+    def __init__(self):
+        self.api = pdr
 
-    for symbol in symbols:
-        df = pdr.DataReader(symbol, 'yahoo', start = start, end = end)
+    def getStocks(self, symbols, timeframe='5Min', limit=30):
+        aggregate = []
+        start = datetime.today() - timedelta(days = limit)
+        end = datetime.today()
 
-        data = pd.DataFrame(data={
-            'time': df.index.strftime('%Y-%m-%d %H:%M:%S'),
-            'close': df['Close'],
-        })
+        df = self.api.DataReader(symbols, 'yahoo', start = start, end = end)
 
-        data['symbol'] = symbol
+        for symbol in symbols:
+            data = pd.DataFrame(data={
+                'time': df.index.strftime('%Y-%m-%d %H:%M:%S'),
+                'close': df['Close'][symbol],
+            })
 
-        aggregate.append(data)
+            data['symbol'] = symbol
 
-    return pd.concat(aggregate)
+            aggregate.append(data)
+
+        return pd.concat(aggregate)

@@ -9,15 +9,15 @@ const app = new Vue({
     },
     options: {
       tickers: '',
-      short: 10,
-      long: 20,
-      timeframe: '5m',
-      movingAverage: 'SMA'
+      short: 5,
+      long: 10,
+      timeframe: '15m',
+      movingAverage: 'EWM'
     }
   },
 
   mounted() {
-    this.selectStock('gme yolo tsla msft lyft');
+    this.selectStock('amc gme rkt');
   },
 
   methods: {
