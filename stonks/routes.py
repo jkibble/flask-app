@@ -25,14 +25,12 @@ def calculate():
     interval = alt.selection_interval(encodings=['x'])
     selection = alt.selection_multi(fields=['symbol'], bind='legend')
 
-    print(stocks)
-
     close = alt.Chart(
         stocks
     ).mark_line(
         point=True
     ).encode(
-        x='time:T',
+        x=alt.X('time:T', axis = alt.Axis(title = 'Date'.upper(), format = ('%d %H:%M'))),
         y='close:Q',
         color='symbol:N',
         tooltip='change:Q',

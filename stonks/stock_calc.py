@@ -80,14 +80,24 @@ class Stonks:
 
         return df
 
+    def getWeekDays(self):
+        today   = datetime.today().replace(hour=15, minute=00)
+        weekday = today.weekday()
+
+        if weekday == 5: # it's Saturday
+            today = today - timedelta(days=1)
+        elif weekday == 6: # it's Sunday
+            today = today - timedelta(days=2)
+
+        yesterday = today.replace(hour=9, minute=00) - timedelta(days=1)
+
+        return yesterday, today
+
     def getStonks(self, tickers, short=5, long=20, timeframe='1D', movingAverage='SMA'):
         symbols = tickers.upper().strip().split(' ')
         df = self.client.getStocks(symbols, timeframe, 30)
         calculated = df.groupby('symbol').apply(self.calculateCrossover, short=short, long=long, movingAverage=movingAverage)
 
-        yesterday = (datetime.today() - timedelta(days=1))
-        today     = datetime.today()
-
-        print(yesterday, today)
+        yesterday, today = self.getWeekDays()
 
         return calculated.sort_index().loc[yesterday:today]
