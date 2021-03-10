@@ -78,10 +78,11 @@ class Stonks:
         df['buy'] = np.where(df['position'] == 1.0, df['close'], float("nan"))
         df['sell'] = np.where(df['position'] == -1.0, df['close'], float("nan"))
 
+
         return df
 
-    def getWeekDays(self):
-        today   = datetime.today().replace(hour=15, minute=00)
+    def getDayScale(self, dayScale):
+        today   = datetime.today().replace(hour=17, minute=00)
         weekday = today.weekday()
 
         if weekday == 5: # it's Saturday
@@ -89,15 +90,19 @@ class Stonks:
         elif weekday == 6: # it's Sunday
             today = today - timedelta(days=2)
 
-        yesterday = today.replace(hour=9, minute=00) - timedelta(days=1)
+        yesterday = today.replace(hour=9, minute=00) - timedelta(days=int(dayScale))
 
         return yesterday, today
 
-    def getStonks(self, tickers, short=5, long=20, timeframe='1D', movingAverage='SMA'):
+    def getStonks(self, tickers, short=5, long=20, timeframe='1D', movingAverage='SMA', dayScale=2):
         symbols = tickers.upper().strip().split(' ')
         df = self.client.getStocks(symbols, timeframe, 30)
         calculated = df.groupby('symbol').apply(self.calculateCrossover, short=short, long=long, movingAverage=movingAverage)
 
-        yesterday, today = self.getWeekDays()
+        start, end = self.getDayScale(dayScale)
+        df = calculated.sort_index().loc[start:end]
 
-        return calculated.sort_index().loc[yesterday:today]
+        df['amount'] = df['close'] * -df['position']
+        df['pnl'] = df['amount'].cumsum()
+
+        return df

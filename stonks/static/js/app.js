@@ -4,20 +4,18 @@ const app = new Vue({
   data: {
     ticker: '',
     tickers: [],
-    stocks: {
-      Datetime: [],
-    },
     options: {
       tickers: '',
       short: 5,
       long: 10,
       timeframe: '15m',
-      movingAverage: 'EWM'
+      movingAverage: 'RSI',
+      dayScale: 0
     }
   },
 
   mounted() {
-    this.selectStock('amc gme rkt');
+    this.selectStock('gme rkt qqq');
   },
 
   methods: {
@@ -62,17 +60,6 @@ const app = new Vue({
         .catch((error) => {
           console.error('Error:', error);
         });
-    },
-
-    formatData(column) {
-      let self = this;
-
-      return this.stocks.Datetime.map(function (date, index) {
-        return {
-          t: new Date(date),
-          x: self.stocks[column][index]
-        }
-      });
     }
   }
 });

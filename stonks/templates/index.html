@@ -37,17 +37,17 @@
           <label class="label">Ticker</label>
           <input type="text" class="input" v-model="options.tickers">
         </div>
-        <div class="column">
-          <label class="label">Short Window</label>
+        <div class="column" v-if="options.movingAverage !== 'RSI'">
+          <label class="label">Rolling Short Samples</label>
           <input type="text" class="input" v-model="options.short">
         </div>
         <div class="column">
-          <label class="label">Long Window</label>
+          <label class="label">Rolling Long Samples</label>
           <input type="text" class="input" v-model="options.long">
         </div>
         <div class="column">
-          <label class="label">Time Scale</label>
-          <select class="select" v-model="options.timeframe">
+          <label class="label">Sample Frequency</label>
+          <select @change="selectStock(options.tickers)" class="select is-fullwidth" v-model="options.timeframe">
             <option value="1m">1 Minute</option>
             <option value="2m">2 Minutes</option>
             <option value="5m">5 Minutes</option>
@@ -59,11 +59,23 @@
           </select>
         </div>
         <div class="column">
-          <label>Rolling Average <input type="radio" v-model="options.movingAverage" value="SMA"></label>
-          <br>
-          <label>Weighted Average <input type="radio" v-model="options.movingAverage" value="EWM"></label>
-          <br>
-          <label>Relative Strength<input type="radio" v-model="options.movingAverage" value="RSI"></label>
+          <label class="label">Display Days</label>
+          <select @change="selectStock(options.tickers)" class="select is-fullwidth" v-model="options.dayScale">
+            <option value="0">1 Day</option>
+            <option value="1">2 Days</option>
+            <option value="2">3 Days</option>
+            <option value="3">4 Days</option>
+            <option value="4">5 Days</option>
+            <option value="9">10 Days</option>
+          </select>
+        </div>
+        <div class="column">
+          <label class="label">Average Type</label>
+          <select @change="selectStock(options.tickers)" class="select is-fullwidth" v-model="options.movingAverage">
+            <option value="SMA">Simple Moving Average</option>
+            <option value="EWM">Weighted Moving Average</option>
+            <option value="RSI">Relative Strength Average</option>
+          </select>
         </div>
         <div class="column">
           <input class="button is-primary" type="submit" value="Update">

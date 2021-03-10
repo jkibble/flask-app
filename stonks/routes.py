@@ -21,29 +21,33 @@ def search():
 @app.route('/select-stocks', methods=['POST'])
 def calculate():
     options = request.get_json()
-    stocks = scraper.getStonks(options['tickers'], options['short'], options['long'], options['timeframe'], options['movingAverage'])
+    stocks = scraper.getStonks(options['tickers'], options['short'], options['long'], options['timeframe'], options['movingAverage'], options['dayScale'])
     interval = alt.selection_interval(encodings=['x'])
     selection = alt.selection_multi(fields=['symbol'], bind='legend')
 
-    close = alt.Chart(
-        stocks
-    ).mark_line(
-        point=True
-    ).encode(
-        x=alt.X('time:T', axis = alt.Axis(title = 'Date'.upper(), format = ('%d %H:%M'))),
-        y='close:Q',
+    print(stocks)
+
+    base = alt.Chart(stocks).encode(
+        x=alt.X('yearmonthdatehoursminutes(time):O', axis = alt.Axis(title = 'Date'.upper(), format = ('%b %d %H:%M'))),
         color='symbol:N',
-        tooltip='change:Q',
-        opacity=alt.condition(selection, alt.value(1), alt.value(0.2))
+        opacity=alt.condition(selection, alt.value(0.5), alt.value(0.1))
+
     ).properties(
         width=1200,
         height=550
+    )
+
+    close = base.mark_line(
+        point=True
+    ).encode(
+        y='close:Q',
+        tooltip='close:Q',
     ).add_selection(
         interval,
         selection
     )
 
-    sell = alt.Chart(stocks).mark_point(
+    sell = base.mark_point(
         filled=True,
         size=200,
         shape='triangle-down',
@@ -55,7 +59,7 @@ def calculate():
         tooltip='close:Q'
     )
 
-    buy = alt.Chart(stocks).mark_point(
+    buy = base.mark_point(
         filled=True,
         size=200,
         shape='triangle-up',
@@ -67,14 +71,11 @@ def calculate():
         tooltip='close:Q'
     )
 
-    area = alt.Chart(stocks).mark_area(
+    area = base.mark_area(
         opacity=0.3
     ).encode(
-        x='time:T',
         y='short:Q',
         y2='long:Q',
-        color='symbol:N',
-        opacity=alt.condition(selection, alt.value(0.5), alt.value(0.1))
     )
 
     chart = close + buy + sell + area
